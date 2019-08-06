@@ -116,7 +116,12 @@ module.exports = function(io) {
     exports.addMessage = (msg) => {
         var message = new Message({messageBody: msg.messageBody, userId: msg.userId});
         message.save();
-        io.emit('chat-message', message);
+        io.emit('chat-message', {
+            body: message.messageBody,
+            id: message._id,
+            conversationId: message.conversationId,
+            userId: message.userId
+        });
     };
 
     exports.getConversations = (req, res) => {
