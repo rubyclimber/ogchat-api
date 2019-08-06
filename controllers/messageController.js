@@ -29,21 +29,14 @@ module.exports = function(io) {
                 }
             });
 
-            return res.send(messages.map(msg => {
-                return {
-                    id: msg._id,
-                    body: msg.messageBody,
-                    userId: msg.userId,
-                    conversationId: msg.conversationId
-                };
-            }));
+            return res.send(this.mapMessage);
         });
     };
 
     exports.createMessage = function(req, res) {
         var message = new Message({messageBody: req.body.messageBody, userId: req.body.userId});
         message.save();
-        io.emit('chat-message', message);
+        io.emit('chat-message', this.mapMessage(message));
         res.status(200).end();
     };
 
@@ -54,7 +47,7 @@ module.exports = function(io) {
                 return console.error(err);
             }
 
-            res.send(messages);
+            res.send(messages.map(this.mapMessage));
         });
     };
 
@@ -81,7 +74,7 @@ module.exports = function(io) {
                     }
                 });
 
-                res.send(messages);
+                res.send(messages.map(this.mapMessage));
             });
         } else if(searchText) {
             Message.find({messageBody: {$regex: searchText, $options: 'i'}}).exec((error, messages) => {
@@ -99,14 +92,7 @@ module.exports = function(io) {
                     }
                 });
 
-                res.send(messages.map(msg => {
-                    return {
-                        body: msg.messageBody,
-                        id: msg._id,
-                        userId: msg.userId,
-                        conversationId: msg.conversationId
-                    };
-                }));
+                res.send(messages.map(this.mapMessage));
             });
         } else {
             res.send({error: 'Must provide search value'});
@@ -114,14 +100,9 @@ module.exports = function(io) {
     };
 
     exports.addMessage = (msg) => {
-        var message = new Message({messageBody: msg.messageBody, userId: msg.userId});
+        var message = new Message({messageBody: msg.body, userId: msg.userId});
         message.save();
-        io.emit('chat-message', {
-            body: message.messageBody,
-            id: message._id,
-            conversationId: message.conversationId,
-            userId: message.userId
-        });
+        io.emit('chat-message', this.mapMessage(message));
     };
 
     exports.getConversations = (req, res) => {
@@ -200,6 +181,15 @@ module.exports = function(io) {
 
             res.send('done');
         });
+    }
+
+    exports.mapMessage = (message) => {
+        return {
+            body: message.messageBody,
+            id: message._id,
+            userId: message.userId,
+            createdAt: message.conversationId
+        };
     }
 
     return exports;

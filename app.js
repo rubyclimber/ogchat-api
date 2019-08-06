@@ -31,7 +31,7 @@ mongoose.connect(settings.connectionStrings.ohGnarly, {useMongoClient: true});
  * Create express app and set middleware components
  */
 let app = express();
-let port = normalizePort(process.env.PORT || '1985');
+let port = normalizePort(process.env.PORT || '1966');
 app.set('port', port);
 
 /**

@@ -1,5 +1,5 @@
 module.exports.getSettings = () => {
-    let environment = process.env.NODE_ENV || 'production';
+    let environment = process.env.NODE_ENV || 'staging';
     let settings;
     if (environment === 'production') {
         settings = require('../settings');
